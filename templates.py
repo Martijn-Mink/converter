@@ -61,3 +61,6 @@ def give_builtin_call(language, builtin_function, arguments):
         argument_string = ", ".join(arguments)
 
         return template.format(argument_string=argument_string)
+
+    elif builtin_function == BuiltinFunction.PLUS:
+        return " + ".join(arguments)

@@ -11,15 +11,6 @@ class Type(enum.Enum):
             return "int"
 
 
-#
-# class BuiltinFunction:
-#
-#     def __init__(self, name, token_function, argument_count):
-#         self.name = name
-#         self.token_function = token_function
-#         self.argument_count = argument_count
-
-
 class Literal:
     def __init__(self, value):
         self.value = value

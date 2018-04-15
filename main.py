@@ -17,10 +17,12 @@ def main():
 
     assignment_x = Assignment(declaration_x, literal_1)
     assignment_y = Assignment(declaration_y, literal_2)
+    assignment_z = Assignment(declaration_z, BuiltinCall(BuiltinFunction.PLUS, [variable_x, variable_y]))
 
     statements = []
     statements.append(Statement(assignment_x))
     statements.append(Statement(assignment_y))
+    statements.append(Statement(assignment_z))
 
     if1 = IfStatement(condition=literal_true,
                       if_clause=2 * [Statement(Assignment(variable_x, literal_1))],

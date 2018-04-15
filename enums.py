@@ -15,3 +15,4 @@ TYPED_LANGUAGES = (Language.CPP, Language.JAVA)
 
 class BuiltinFunction(enum.Enum):
     PRINT = 0
+    PLUS = 1
