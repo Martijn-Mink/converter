@@ -19,28 +19,31 @@ def main():
     assignment_y = Assignment(declaration_y, literal_2)
 
     statements = []
-    statements.append(Statement(assignment_x, 1))
-    statements.append(Statement(assignment_y, 1))
+    statements.append(Statement(assignment_x))
+    statements.append(Statement(assignment_y))
 
     if1 = IfStatement(condition=literal_true,
-                      if_clause=2 * [Statement(Assignment(variable_x, literal_1), 2)],
-                      else_clause=2 * [Statement(Assignment(variable_x, literal_2), 2)], level=1)
+                      if_clause=2 * [Statement(Assignment(variable_x, literal_1))],
+                      else_clause=2 * [Statement(Assignment(variable_x, literal_2))])
 
     if2 = IfStatement(condition=literal_true,
-                      if_clause=2 * [Statement(Assignment(variable_x, literal_1), 3)],
-                      else_clause=2 * [Statement(Assignment(variable_x, literal_2), 3)], level=2)
+                      if_clause=2 * [Statement(Assignment(variable_x, literal_1))],
+                      else_clause=2 * [Statement(Assignment(variable_x, literal_2))])
 
     if3 = IfStatement(condition=literal_true,
-                      if_clause=2 * [Statement(Assignment(variable_x, literal_1), 2)],
-                      else_clause=[if2], level=1)
+                      if_clause=2 * [Statement(Assignment(variable_x, literal_1))],
+                      else_clause=[if2])
 
     statements.extend([if3, if1])
 
     call = Call("calc", [variable_x, literal_2])
-    statements.append(Statement(call, 1))
+    statements.append(Statement(call))
 
     call_bi = BuiltinCall(BuiltinFunction.PRINT, [variable_x, literal_2])
-    statements.append(Statement(call_bi, 1))
+    statements.append(Statement(call_bi))
+
+    for statement in statements:
+        statement.level = 0
 
     for language in Language:
         print(language)
