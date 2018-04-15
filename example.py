@@ -1,4 +1,11 @@
-if 1:
-    1
+print(1)
+
+if a:
+    c = 6
 else:
-    2
+    if b:
+        d = 9
+        d = 9
+    else:
+        u = 8
+        u = 8

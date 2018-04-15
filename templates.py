@@ -1,4 +1,67 @@
+import _ast
+
 from enums import BuiltinFunction, Language
+
+TAB = "    "
+
+
+def give_expr(language, level):
+    indent = level * TAB
+
+    if language == Language.PYTHON:
+        template = indent + "{value}"
+    else:
+        template = indent + "{value};"
+
+    return template
+
+
+def give_assign(language, level):
+    indent = level * TAB
+
+    if language == Language.PYTHON:
+        template = indent + "{target0} = {value}"
+    else:
+        template = indent + "{target0} = {value};"
+
+    return template
+
+
+def give_if(language, level):
+    indent = level * TAB
+
+    if language == Language.PYTHON:
+        template = indent + "if {test}:\n" \
+                   + "{body}\n" \
+                   + indent + "else:\n" \
+                   + "{orelse}"
+    else:
+        template = indent + "if ({test})\n" \
+                   + indent + "{{\n" \
+                   + "{body}\n" \
+                   + indent + "}}\n" \
+                   + indent + "else\n" \
+                   + indent + "{{\n" \
+                   + "{orelse}\n" \
+                   + indent + "}}"
+
+    return template
+
+
+def give_binop(language, op):
+    if type(op) is _ast.Add:
+        template = "{left} + {right}"
+    elif type(op) is _ast.Sub:
+        template = "{left} - {right}"
+    elif type(op) is _ast.Mult:
+        template = "{left} * {right}"
+    else:
+        raise NotImplementedError(str(type(op)) + " not implemented")
+
+    return template
+
+
+##########
 
 
 def give_declaration(language, type, name):
