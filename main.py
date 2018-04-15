@@ -22,10 +22,15 @@ def main():
     statements.append(Statement(assignment_x))
     statements.append(Statement(assignment_y))
 
-    statements.append(
-        IfStatement(condition=literal_true,
-                    if_clause=Statement(Assignment(variable_x, literal_1)),
-                    else_clause=Statement(Assignment(variable_x, literal_2))))
+    if1 = IfStatement(condition=literal_true,
+                      if_clause=2 * [Statement(Assignment(variable_x, literal_1))],
+                      else_clause=10 * [Statement(Assignment(variable_x, literal_2))])
+
+    if2 = IfStatement(condition=literal_true,
+                      if_clause=2 * [Statement(Assignment(variable_x, literal_1))],
+                      else_clause=[if1])
+
+    statements.extend([if1, if2])
 
     call = Call("calc", [variable_x, literal_2])
     statements.append(Statement(call))

@@ -67,8 +67,8 @@ class IfStatement:
     def to_code(self, language):
         return templates.give_if_statement(language,
                                            condition=self.condition.to_code(language),
-                                           if_clause=self.if_clause.to_code(language),
-                                           else_clause=self.else_clause.to_code(language))
+                                           if_clause=list(map(lambda x: x.to_code(language), self.if_clause)),
+                                           else_clause=list(map(lambda x: x.to_code(language), self.else_clause)))
 
 
 class Statement:

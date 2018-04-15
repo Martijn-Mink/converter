@@ -10,32 +10,24 @@ def give_assignment(language, lhs, rhs):
     return template.format(lhs=lhs, rhs=rhs)
 
 
-IF_TEMPLATE_PYTHON = """
-if {condition}:
-    {if_clause}
-else:
-    {else_clause}        
-""".strip()
-
-IF_TEMPLATE_CPP_JAVA = """
-if ({condition}) 
-{{
-    {if_clause}
-}}
-else 
-{{
-    {else_clause}
-}}
-""".strip()
-
-
 def give_if_statement(language, condition, if_clause, else_clause):
     if language == Language.PYTHON:
-        template = IF_TEMPLATE_PYTHON
-    else:
-        template = IF_TEMPLATE_CPP_JAVA
+        template = "if {}:\n" \
+                   + "    {}\n" * len(if_clause) \
+                   + "else:\n" \
+                   + "\n".join(["    {}"] * len(else_clause))
 
-    return template.format(condition=condition, if_clause=if_clause, else_clause=else_clause)
+    else:
+        template = "if {}\n" \
+                   + "{{\n" \
+                   + "    {}\n" * len(if_clause) \
+                   + "}}\n" \
+                   + "else:\n" \
+                   + "{{\n" \
+                   + "    {}\n" * len(else_clause) \
+                   + "}}"
+
+    return template.format(condition, *if_clause, *else_clause)
 
 
 def give_statement(language, content):
