@@ -7,49 +7,71 @@ from enums import Language
 PATH = "example.py"
 
 
-def to_code(node, language, level):
-    if type(node) is _ast.Expr:
-        template = templates.give_expr(language, level)
-        value = to_code(node.value, language, level)
-        return template.format(value=value)
+def find_type(value):
+    return "int"
 
-    elif type(node) is _ast.Assign:
-        template = templates.give_assign(language, level)
-        target0 = to_code(node.targets[0], language, level)
-        value = to_code(node.value, language, level)
-        return template.format(target0=target0, value=value)
 
-    elif type(node) is _ast.Num:
-        return str(node.n)
+class AstCoder:
 
-    elif type(node) is _ast.Name:
-        return str(node.id)
+    def __init__(self):
+        self.declared_names = []
 
-    elif type(node) is _ast.If:
-        template = templates.give_if(language, level)
-        test = to_code(node.test, language, level)
+    def __call__(self, node, language, level):
+        if type(node) is _ast.Expr:
+            template = templates.give_expr(language, level)
+            value = self(node.value, language, level)
+            return template.format(value=value)
 
-        body = []
-        for body_node in node.body:
-            body.append(to_code(body_node, language, level + 1))
-        body = "\n".join(body)
+        elif type(node) is _ast.Assign:
+            target0 = self(node.targets[0], language, level)
+            value = self(node.value, language, level)
+            type = find_type(value)
 
-        orelse = []
-        for orelse_node in node.orelse:
-            orelse.append(to_code(orelse_node, language, level + 1))
-        orelse = "\n".join(orelse)
+            if target0 in self.declared_names:
+                template = templates.give_assign(language, level)
+            else:
+                template = templates.give_declared_assign(language, level)
+                self.declared_names.append(target0)
 
-        return template.format(test=test, body=body, orelse=orelse)
+            return template.format(target0=target0, value=value)
 
-    elif type(node) is _ast.BinOp:
-        template = templates.give_binop(language, node.op)
+        elif type(node) is _ast.Num:
+            return str(node.n)
 
-        left = to_code(node.left, language, level)
-        right = to_code(node.right, language, level)
-        return template.format(left=left, right=right)
+        elif type(node) is _ast.Str:
+            return '"' + node.s + '"'
 
-    else:
-        raise NotImplementedError(str(type(node)) + " not implemented")
+        elif type(node) is _ast.Name:
+            return str(node.id)
+
+        elif type(node) is _ast.If:
+            template = templates.give_if(language, level)
+            test = self(node.test, language, level)
+
+            body = []
+            for body_node in node.body:
+                body.append(self(body_node, language, level + 1))
+            body = "\n".join(body)
+
+            orelse = []
+            for orelse_node in node.orelse:
+                orelse.append(self(orelse_node, language, level + 1))
+            orelse = "\n".join(orelse)
+
+            return template.format(test=test, body=body, orelse=orelse)
+
+        elif type(node) is _ast.BinOp:
+            template = templates.give_binop(language, node.op)
+
+            left = self(node.left, language, level)
+            right = self(node.right, language, level)
+            return template.format(left=left, right=right)
+
+        elif type(node) is _ast.Call:
+            func = self(node.func, language, level)
+
+        else:
+            raise NotImplementedError(str(type(node)) + " not implemented")
 
 
 def main():
@@ -57,10 +79,11 @@ def main():
         code = f.read()
 
     tree = ast.parse(code)
+    coder = AstCoder()
 
     language = Language.CPP
     for node in tree.body:
-        print(to_code(node, language, 0))
+        print(coder(node, language, 0))
 
 
 if __name__ == "__main__":

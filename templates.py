@@ -26,6 +26,15 @@ def give_assign(language, level):
 
     return template
 
+def give_declared_assign(language, level):
+    indent = level * TAB
+
+    if language == Language.PYTHON:
+        template = indent + "DECL {target0} = {value}"
+    else:
+        template = indent + "DECL {target0} = {value};"
+
+    return template
 
 def give_if(language, level):
     indent = level * TAB
