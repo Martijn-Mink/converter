@@ -59,24 +59,31 @@ class Assignment:
 
 
 class IfStatement:
-    def __init__(self, condition, if_clause, else_clause):
+    def __init__(self, condition, if_clause, else_clause, level):
         self.condition = condition
         self.if_clause = if_clause
         self.else_clause = else_clause
+        self.level = level
 
     def to_code(self, language):
+        if_clause = '\n'.join(map(lambda x: x.to_code(language), self.if_clause))
+        else_clause = '\n'.join(map(lambda x: x.to_code(language), self.else_clause))
+
         return templates.give_if_statement(language,
+                                           self.level,
                                            condition=self.condition.to_code(language),
-                                           if_clause=list(map(lambda x: x.to_code(language), self.if_clause)),
-                                           else_clause=list(map(lambda x: x.to_code(language), self.else_clause)))
+                                           if_clause=if_clause,
+                                           else_clause=else_clause)
 
 
 class Statement:
-    def __init__(self, content):
+    def __init__(self, content, level):
         self.content = content
+        self.level = level
 
     def to_code(self, language):
         return templates.give_statement(language,
+                                        self.level,
                                         content=self.content.to_code(language))
 
 

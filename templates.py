@@ -10,31 +10,32 @@ def give_assignment(language, lhs, rhs):
     return template.format(lhs=lhs, rhs=rhs)
 
 
-def give_if_statement(language, condition, if_clause, else_clause):
+def give_if_statement(language, level, condition, if_clause, else_clause):
+    indent = level * "    "
+
     if language == Language.PYTHON:
-        template = "if {}:\n" \
-                   + "    {}\n" * len(if_clause) \
-                   + "else:\n" \
-                   + "\n".join(["    {}"] * len(else_clause))
-
+        template = indent + "if {condition}:\n" \
+                   + "{if_clause}\n" \
+                   + indent + "else:\n" \
+                   + "{else_clause}"
     else:
-        template = "if {}\n" \
-                   + "{{\n" \
-                   + "    {}\n" * len(if_clause) \
-                   + "}}\n" \
-                   + "else:\n" \
-                   + "{{\n" \
-                   + "    {}\n" * len(else_clause) \
-                   + "}}"
+        template = indent + "if ({condition})\n" \
+                   + indent + "{{\n" \
+                   + "{if_clause}\n" \
+                   + indent + "}}\n" \
+                   + level * "    " + "else:\n" \
+                   + indent + "{{\n" \
+                   + "{else_clause}\n" \
+                   + indent + "}}"
 
-    return template.format(condition, *if_clause, *else_clause)
+    return template.format(condition=condition, if_clause=if_clause, else_clause=else_clause)
 
 
-def give_statement(language, content):
+def give_statement(language, level, content):
     if language == Language.PYTHON:
-        template = "{content}"
+        template = level * "    " + "{content}"
     else:
-        template = "{content};"
+        template = level * "    " + "{content};"
 
     return template.format(content=content)
 
