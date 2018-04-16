@@ -2,19 +2,28 @@ import _ast
 import ast
 
 import templates
-from enums import Language
+from enums import Language, VarType
 
 PATH = "example.py"
-
-
-def find_type(value):
-    return "int"
 
 
 class AstCoder:
 
     def __init__(self):
-        self.declared_names = []
+        self.declared_names = {}
+
+    def find_var_type(self, node):
+        if type(node) is _ast.Num:
+            return VarType.from_value(node.n)
+
+        elif type(node) is _ast.Name:
+            return self.declared_names[node.id]
+
+        elif type(node) is _ast.BinOp:
+            return VarType.combine(self.find_var_type(node.left), self.find_var_type(node.right))
+
+        else:
+            raise NotImplementedError
 
     def __call__(self, node, language, level):
         if type(node) is _ast.Expr:
@@ -25,15 +34,20 @@ class AstCoder:
         elif type(node) is _ast.Assign:
             target0 = self(node.targets[0], language, level)
             value = self(node.value, language, level)
-            type = find_type(value)
 
             if target0 in self.declared_names:
                 template = templates.give_assign(language, level)
+                code = template.format(target0=target0, value=value)
             else:
-                template = templates.give_declared_assign(language, level)
-                self.declared_names.append(target0)
+                var_type = self.find_var_type(node.value)
 
-            return template.format(target0=target0, value=value)
+                template = templates.give_declared_assign(language, level)
+                code = template.format(target0=target0, value=value, var_type=var_type.to_code(language))
+
+                node.targets[0].var_type = var_type
+                self.declared_names[target0] = var_type
+
+            return code
 
         elif type(node) is _ast.Num:
             return str(node.n)
