@@ -4,6 +4,27 @@ from enums import BuiltinFunction, Language
 
 TAB = "    "
 
+HEADER = {Language.PYTHON: None}
+FOOTER = {Language.PYTHON: None}
+
+HEADER[Language.CPP] = """#include <iostream>
+
+int main() 
+{"""
+
+FOOTER[Language.CPP] = """    return 0;
+}"""
+
+HEADER[Language.JAVA] = """public class GeneratedClass
+{
+    public static void main(String[] args)
+    {"""
+
+FOOTER[Language.JAVA] = """    }
+}"""
+
+STARTING_INDENT = {Language.CPP: 1, Language.JAVA: 2, Language.PYTHON: 0}
+
 
 def give_expr(language, level):
     indent = level * TAB
@@ -70,6 +91,13 @@ def give_binop(language, op):
         raise NotImplementedError(str(type(op)) + " not implemented")
 
     return template
+
+
+def give_bool_code(language, value):
+    if language == Language.PYTHON:
+        return str(value)
+    else:
+        return str(value).lower()
 
 
 ##########

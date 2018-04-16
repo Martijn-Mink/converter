@@ -1,56 +1,49 @@
-from enums import Language, BuiltinFunction
-from nodes import Statement, IfStatement, Declaration, Variable, Literal, Type, Assignment, Call, BuiltinCall
+import ast
+
+import astcoder
+import enums
+import templates
+
+INPUT_PATH = 'example.py'
+
+
+def create_code(tree, language):
+    coder = astcoder.AstCoder()
+
+    header = templates.HEADER[language]
+    footer = templates.FOOTER[language]
+    starting_level = templates.STARTING_INDENT[language]
+
+    code = []
+    for node in tree.body:
+        code.append(coder(node, language, starting_level))
+
+    if header:
+        code = [header] + code
+
+    if footer:
+        code = code + [footer]
+
+    return '\n'.join(code)
 
 
 def main():
-    literal_1 = Literal("1")
-    literal_2 = Literal("2")
-    literal_true = Literal("True")
+    with open(INPUT_PATH, 'r') as f:
+        code = f.read()
 
-    variable_x = Variable("x", Type.INT)
-    variable_y = Variable("y", Type.INT)
-    variable_z = Variable("z", Type.INT)
+    tree = ast.parse(code)
 
-    declaration_x = Declaration(variable_x)
-    declaration_y = Declaration(variable_y)
-    declaration_z = Declaration(variable_z)
+    code = create_code(tree, enums.Language.PYTHON)
+    with open("out.py", 'w') as code_file:
+        code_file.write(code)
 
-    assignment_x = Assignment(declaration_x, literal_1)
-    assignment_y = Assignment(declaration_y, literal_2)
-    assignment_z = Assignment(declaration_z, BuiltinCall(BuiltinFunction.PLUS, [variable_x, variable_y]))
+    code = create_code(tree, enums.Language.JAVA)
+    with open("out.java", 'w') as code_file:
+        code_file.write(code)
 
-    statements = []
-    statements.append(Statement(assignment_x))
-    statements.append(Statement(assignment_y))
-    statements.append(Statement(assignment_z))
-
-    if1 = IfStatement(condition=literal_true,
-                      if_clause=2 * [Statement(Assignment(variable_x, literal_1))],
-                      else_clause=2 * [Statement(Assignment(variable_x, literal_2))])
-
-    if2 = IfStatement(condition=literal_true,
-                      if_clause=2 * [Statement(Assignment(variable_x, literal_1))],
-                      else_clause=2 * [Statement(Assignment(variable_x, literal_2))])
-
-    if3 = IfStatement(condition=literal_true,
-                      if_clause=2 * [Statement(Assignment(variable_x, literal_1))],
-                      else_clause=[if2])
-
-    statements.extend([if3, if1])
-
-    call = Call("calc", [variable_x, literal_2])
-    statements.append(Statement(call))
-
-    call_bi = BuiltinCall(BuiltinFunction.PRINT, [variable_x, literal_2])
-    statements.append(Statement(call_bi))
-
-    for statement in statements:
-        statement.level = 0
-
-    for language in Language:
-        print(language)
-        for statement in statements:
-            print(statement.to_code(language))
+    code = create_code(tree, enums.Language.CPP)
+    with open("out.cpp", 'w') as code_file:
+        code_file.write(code)
 
 
 if __name__ == "__main__":

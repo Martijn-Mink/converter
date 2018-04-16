@@ -10,11 +10,49 @@ class Language(enum.Enum):
         return self in TYPED_LANGUAGES
 
 
+class BuiltinFunction(enum.Enum):
+    PRINT = 1
+
+    def to_name(self):
+        if self == BuiltinFunction.PRINT:
+            return "print"
+        else:
+            raise NotImplementedError
+
+    def to_template(self, language):
+        if self == BuiltinFunction.PRINT:
+            if language == Language.PYTHON:
+                template = "print({})"
+            elif language == Language.CPP:
+                template = "std::cout << {} << std::endl"
+            else:
+                template = "System.out.println({})"
+        else:
+            raise NotImplementedError
+
+        return template
+
+    @classmethod
+    def from_name(cls, name):
+        for builtin_function in BuiltinFunction:
+            if name == builtin_function.to_name():
+                return builtin_function
+
+    @staticmethod
+    def give_names():
+
+        names = []
+        for builtin_function in BuiltinFunction:
+            names.append(builtin_function.to_name())
+
+        return names
+
+
 class VarType(enum.Enum):
     INT = 0
     FLOAT = 1
 
-    def to_code(self, language):
+    def to_name(self, language):
         if self == VarType.INT:
             return "int"
 
@@ -41,8 +79,3 @@ class VarType(enum.Enum):
 
 
 TYPED_LANGUAGES = (Language.CPP, Language.JAVA)
-
-
-class BuiltinFunction(enum.Enum):
-    PRINT = 0
-    PLUS = 1
