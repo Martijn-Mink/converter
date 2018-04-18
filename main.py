@@ -1,18 +1,19 @@
 import ast
+import os
 
 import astcoder
 import enums
 import templates
 
-INPUT_PATH = 'example.py'
+INPUT_PATH = os.path.join('code', 'input.py')
 
 
 def create_code(tree, language):
     coder = astcoder.AstCoder()
 
-    header = templates.HEADER[language]
-    footer = templates.FOOTER[language]
-    starting_level = templates.STARTING_INDENT[language]
+    header = templates.give_header(language)
+    footer = templates.give_footer(language)
+    starting_level = language.give_starting_indent()
 
     code = []
     for node in tree.body:
@@ -33,17 +34,11 @@ def main():
 
     tree = ast.parse(code)
 
-    code = create_code(tree, enums.Language.PYTHON)
-    with open("out.py", 'w') as code_file:
-        code_file.write(code)
-
-    code = create_code(tree, enums.Language.JAVA)
-    with open("out.java", 'w') as code_file:
-        code_file.write(code)
-
-    code = create_code(tree, enums.Language.CPP)
-    with open("out.cpp", 'w') as code_file:
-        code_file.write(code)
+    for language in enums.Language:
+        code = create_code(tree, language)
+        output_path = os.path.join('code', 'GeneratedCode' + language.give_extension())
+        with open(output_path, 'w') as code_file:
+            code_file.write(code)
 
 
 if __name__ == "__main__":

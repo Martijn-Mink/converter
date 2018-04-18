@@ -1,82 +1,105 @@
 import _ast
 
+import multilinetemplates
 from enums import BuiltinFunction, Language
 
 TAB = "    "
 
-HEADER = {Language.PYTHON: None}
-FOOTER = {Language.PYTHON: None}
+_NAME = {
+    Language.PYTHON: "{id}",
+    Language.JAVA: "{id}",
+    Language.CPP: "{id}",
+    Language.BASH: "${id}"
+}
 
-HEADER[Language.CPP] = """#include <iostream>
+_PRINT = {
+    Language.PYTHON: "print({args0})",
+    Language.JAVA: "System.out.println({args0})",
+    Language.CPP: "std::cout << {args0} << std::endl",
+    Language.BASH: "echo {args0}"
+}
 
-int main() 
-{"""
+_EXPRESSION = {
+    Language.PYTHON: "{value}",
+    Language.JAVA: "{value};",
+    Language.CPP: "{value};",
+    Language.BASH: "{value}"
+}
 
-FOOTER[Language.CPP] = """    return 0;
-}"""
+_DECLARED_ASSIGN = {
+    Language.PYTHON: "{target0} = {value}",
+    Language.JAVA: "{var_type} {target0} = {value};",
+    Language.CPP: "{var_type} {target0} = {value};",
+    Language.BASH: "{target0}={value}"
+}
 
-HEADER[Language.JAVA] = """public class GeneratedClass
-{
-    public static void main(String[] args)
-    {"""
+_ASSIGN = {
+    Language.PYTHON: "{target0} = {value}",
+    Language.JAVA: "{target0} = {value};",
+    Language.CPP: "{target0} = {value};",
+    Language.BASH: "{target0}={value}"
+}
 
-FOOTER[Language.JAVA] = """    }
-}"""
+_IF = {
+    Language.PYTHON: multilinetemplates.IF_PYTHON,
+    Language.JAVA: multilinetemplates.IF_JAVA_CPP,
+    Language.CPP: multilinetemplates.IF_JAVA_CPP,
+    Language.BASH: multilinetemplates.IF_BASH
+}
 
-STARTING_INDENT = {Language.CPP: 1, Language.JAVA: 2, Language.PYTHON: 0}
+_HEADER = {
+    Language.PYTHON: None,
+    Language.JAVA: multilinetemplates.HEADER_JAVA,
+    Language.CPP: multilinetemplates.HEADER_CPP,
+    Language.BASH: None
+}
+
+_FOOTER = {
+    Language.PYTHON: None,
+    Language.JAVA: multilinetemplates.FOOTER_JAVA,
+    Language.CPP: multilinetemplates.FOOTER_CPP,
+    Language.BASH: None
+}
+
+
+def give_builtin_function(builtin_function, language):
+    if builtin_function == BuiltinFunction.PRINT:
+        return _PRINT[language]
+
+
+def give_header(language):
+    return _HEADER[language]
+
+
+def give_footer(language):
+    return _FOOTER[language]
+
+
+def give_name(language):
+    return _NAME[language]
 
 
 def give_expr(language, level):
     indent = level * TAB
-
-    if language == Language.PYTHON:
-        template = indent + "{value}"
-    else:
-        template = indent + "{value};"
-
+    template = indent + _EXPRESSION[language]
     return template
 
 
 def give_assign(language, level):
     indent = level * TAB
-
-    if language == Language.PYTHON:
-        template = indent + "{target0} = {value}"
-    else:
-        template = indent + "{target0} = {value};"
-
+    template = indent + _ASSIGN[language]
     return template
 
 
 def give_declared_assign(language, level):
     indent = level * TAB
-
-    if language == Language.PYTHON:
-        template = indent + "{target0} = {value}"
-    else:
-        template = indent + "{var_type} {target0} = {value};"
-
+    template = indent + _DECLARED_ASSIGN[language]
     return template
 
 
 def give_if(language, level):
     indent = level * TAB
-
-    if language == Language.PYTHON:
-        template = indent + "if {test}:\n" \
-                   + "{body}\n" \
-                   + indent + "else:\n" \
-                   + "{orelse}"
-    else:
-        template = indent + "if ({test})\n" \
-                   + indent + "{{\n" \
-                   + "{body}\n" \
-                   + indent + "}}\n" \
-                   + indent + "else\n" \
-                   + indent + "{{\n" \
-                   + "{orelse}\n" \
-                   + indent + "}}"
-
+    template = _IF[language].replace("INDENT", indent)
     return template
 
 
@@ -89,6 +112,9 @@ def give_binop(language, op):
         template = "{left} * {right}"
     else:
         raise NotImplementedError(str(type(op)) + " not implemented")
+
+    if language == Language.BASH:
+        template = "$((" + template + "))"
 
     return template
 

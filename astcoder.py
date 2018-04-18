@@ -17,7 +17,7 @@ class AstCoder:
             return self.declared_names[node.id]
 
         elif type(node) is _ast.BinOp:
-            return VarType.combine(self.find_var_type(node.left), self.find_var_type(node.right))
+            return VarType.reduce(self.find_var_type(node.left), self.find_var_type(node.right))
 
         else:
             raise NotImplementedError
@@ -29,7 +29,7 @@ class AstCoder:
             return template.format(value=value)
 
         elif type(node) is _ast.Assign:
-            target0 = self(node.targets[0], language, level)
+            target0 = node.targets[0].id  # Do not use self call here
             value = self(node.value, language, level)
 
             if target0 in self.declared_names:
@@ -39,7 +39,7 @@ class AstCoder:
                 var_type = self.find_var_type(node.value)
 
                 template = templates.give_declared_assign(language, level)
-                code = template.format(target0=target0, value=value, var_type=var_type.to_name(language))
+                code = template.format(target0=target0, value=value, var_type=var_type.to_name())
 
                 node.targets[0].var_type = var_type
                 self.declared_names[target0] = var_type
@@ -53,7 +53,8 @@ class AstCoder:
             return '"' + node.s + '"'
 
         elif type(node) is _ast.Name:
-            return str(node.id)
+            template = templates.give_name(language)
+            return template.format(id=node.id)
 
         elif type(node) is _ast.If:
             template = templates.give_if(language, level)
@@ -81,11 +82,11 @@ class AstCoder:
         elif type(node) is _ast.Call:
             function_name = node.func.id
 
-            if function_name in BuiltinFunction.give_names():
-                builtin_function = BuiltinFunction.from_name(function_name)
-                template = builtin_function.to_template(language)
+            if function_name in BuiltinFunction.give_python_names():
+                builtin_function = BuiltinFunction.from_python_name(function_name)
+                template = templates.give_builtin_function(builtin_function, language)
 
-                return template.format(1)
+                return template.format(args0=self(node.args[0], language, level))
 
         elif type(node) is _ast.NameConstant:
             return templates.give_bool_code(language, node.value)
