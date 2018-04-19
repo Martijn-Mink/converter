@@ -19,6 +19,9 @@ class AstCoder:
         elif type(node) is _ast.BinOp:
             return VarType.reduce(self.find_var_type(node.left), self.find_var_type(node.right))
 
+        elif type(node) is _ast.Compare:
+            return VarType.BOOL
+
         else:
             raise NotImplementedError
 
@@ -39,7 +42,7 @@ class AstCoder:
                 var_type = self.find_var_type(node.value)
 
                 template = templates.give_declared_assign(language, level)
-                code = template.format(target0=target0, value=value, var_type=var_type.to_name())
+                code = template.format(target0=target0, value=value, var_type=var_type.to_name(language))
 
                 node.targets[0].var_type = var_type
                 self.declared_names[target0] = var_type
@@ -90,6 +93,14 @@ class AstCoder:
 
         elif type(node) is _ast.NameConstant:
             return templates.give_bool_code(language, node.value)
+
+        elif type(node) is _ast.Compare:
+            # https://stackoverflow.com/questions/20449543/bash-equality-operators-eq
+            template = templates.give_compare(language, node.ops[0])
+
+            left = self(node.left, language, level)
+            comparators0 = self(node.comparators[0], language, level)
+            return template.format(left=left, comparators0=comparators0)
 
         else:
             raise NotImplementedError(str(type(node)) + " not implemented")

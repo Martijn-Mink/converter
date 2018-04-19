@@ -28,11 +28,10 @@ INDENT{{
 {orelse}
 INDENT}}"""
 
-IF_BASH = """INDENTif [{test}]
+IF_BASH = """INDENTif [ {test} ]
 INDENTthen    
 {body}
 INDENTelse
 {orelse}
-INDENTfi
-"""
+INDENTfi"""
 

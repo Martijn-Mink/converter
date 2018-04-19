@@ -60,13 +60,23 @@ class BuiltinFunction(enum.Enum):
 class VarType(enum.Enum):
     INT = 0
     FLOAT = 1
+    BOOL = 2
 
-    def to_name(self):
+    def to_name(self, language):
         if self == VarType.INT:
             return "int"
 
-        if self == VarType.FLOAT:
+        elif self == VarType.FLOAT:
             return "double"
+
+        elif self == VarType.BOOL:
+            if language == Language.JAVA:
+                return "boolean"
+            else:
+                return "bool"
+
+        else:
+            raise NotImplementedError
 
     @classmethod
     def from_value(cls, value):

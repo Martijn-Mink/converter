@@ -26,6 +26,13 @@ _EXPRESSION = {
     Language.BASH: "{value}"
 }
 
+_EVALUATION = {
+    Language.PYTHON: "({contents})",
+    Language.JAVA: "({contents})",
+    Language.CPP: "({contents})",
+    Language.BASH: "$(({contents}))"
+}
+
 _DECLARED_ASSIGN = {
     Language.PYTHON: "{target0} = {value}",
     Language.JAVA: "{var_type} {target0} = {value};",
@@ -103,18 +110,61 @@ def give_if(language, level):
     return template
 
 
+def give_evaluation(language):
+    return _EVALUATION[language]
+
+
+def give_compare(language, op):
+
+    # Booleans are only supported in if statements currently
+    template = "{contents}"
+    #template = give_evaluation(language)
+
+    if language != Language.BASH:
+        if type(op) is _ast.Eq:
+            template = template.format(contents="{left} == {comparators0}")
+        elif type(op) is _ast.NotEq:
+            template = template.format(contents="{left} != {comparators0}")
+        elif type(op) is _ast.Gt:
+            template = template.format(contents="{left} > {comparators0}")
+        elif type(op) is _ast.Lt:
+            template = template.format(contents="{left} < {comparators0}")
+        elif type(op) is _ast.GtE:
+            template = template.format(contents="{left} >= {comparators0}")
+        elif type(op) is _ast.LtE:
+            template = template.format(contents="{left} <= {comparators0}")
+        else:
+            raise NotImplementedError("{}".format(op))
+    else:
+        if type(op) is _ast.Eq:
+            template = template.format(contents="{left} -eq {comparators0}")
+        elif type(op) is _ast.NotEq:
+            template = template.format(contents="{left} -ne {comparators0}")
+        elif type(op) is _ast.Gt:
+            template = template.format(contents="{left} -gt {comparators0}")
+        elif type(op) is _ast.Lt:
+            template = template.format(contents="{left} -lt {comparators0}")
+        elif type(op) is _ast.GtE:
+            template = template.format(contents="{left} -ge {comparators0}")
+        elif type(op) is _ast.LtE:
+            template = template.format(contents="{left} -le {comparators0}")
+        else:
+            raise NotImplementedError("{}".format(op))
+
+    return template
+
+
 def give_binop(language, op):
+    template = give_evaluation(language)
+
     if type(op) is _ast.Add:
-        template = "{left} + {right}"
+        template = template.format(contents="{left} + {right}")
     elif type(op) is _ast.Sub:
-        template = "{left} - {right}"
+        template = template.format(contents="{left} - {right}")
     elif type(op) is _ast.Mult:
-        template = "{left} * {right}"
+        template = template.format(contents="{left} * {right}")
     else:
         raise NotImplementedError(str(type(op)) + " not implemented")
-
-    if language == Language.BASH:
-        template = "$((" + template + "))"
 
     return template
 
