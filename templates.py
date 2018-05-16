@@ -35,14 +35,14 @@ _ASSIGN = {
     Language.CPP: "{target0} = {value};"
 }
 
+_FUNCTION_DEFINITION = {
+    Language.PYTHON: multilinetemplates.FUNCTION_DEFINITION_PYTHON,
+    Language.CPP: multilinetemplates.FUNCTION_DEFINITION_CPP
+}
+
 _IF = {
     Language.PYTHON: multilinetemplates.IF_PYTHON,
     Language.CPP: multilinetemplates.IF_CPP
-}
-
-_ELSE_IF = {
-    Language.PYTHON: multilinetemplates.ELSE_IF_PYTHON,
-    Language.CPP: multilinetemplates.ELSE_IF_CPP
 }
 
 _ELSE = {
@@ -61,9 +61,12 @@ _FOOTER = {
 }
 
 
-def give_builtin_function(builtin_function, language):
+def give_builtin_function_call(builtin_function, language):
     if builtin_function == BuiltinFunction.PRINT:
         return _PRINT[language]
+
+def give_function_call(language):
+    return "{func}({argument_string})"
 
 
 def give_header(language):
@@ -108,14 +111,18 @@ def give_else(language, level):
     return template
 
 
-def give_else_IF(language, level):
-    indent = level * TAB
-    template = _ELSE_IF[language].replace("INDENT", indent)
-    return template
-
-
 def give_evaluation(language):
     return _EVALUATION[language]
+
+
+def give_function_definition(language, level):
+    indent = level * TAB
+    return _FUNCTION_DEFINITION[language].replace("INDENT", indent)
+
+
+def give_return(language, level):
+    indent = level * TAB
+    return indent + "return {value}"
 
 
 def give_compare(language, op):

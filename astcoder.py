@@ -95,16 +95,21 @@ class AstCoder:
             return template.format(left=left, right=right)
 
         elif type(node) is _ast.Call:
-            function_name = node.func.id
+            func = self(node.func, language, level)
 
-            if function_name in BuiltinFunction.give_python_names():
-                builtin_function = BuiltinFunction.from_python_name(function_name)
-                template = templates.give_builtin_function(builtin_function, language)
+            if func in BuiltinFunction.give_python_names():
+                builtin_function = BuiltinFunction.from_python_name(func)
+                template = templates.give_builtin_function_call(builtin_function, language)
 
                 return template.format(args0=self(node.args[0], language, level))
 
-        # elif type(node) is _ast.NameConstant:
-        #     return templates.give_bool_code(language, node.value)
+            else:
+                argument_string = ", ".join(self(argument, language, level) for argument in node.args)
+                template = templates.give_function_call(language)
+                return template.format(func=func,argument_string=argument_string)
+
+        elif type(node) is _ast.NameConstant:
+            return templates.give_bool_code(language, node.value)
 
         elif type(node) is _ast.Compare:
             # https://stackoverflow.com/questions/20449543/bash-equality-operators-eq
@@ -113,6 +118,26 @@ class AstCoder:
             left = self(node.left, language, level)
             comparators0 = self(node.comparators[0], language, level)
             return template.format(left=left, comparators0=comparators0)
+
+        elif type(node) is _ast.FunctionDef:
+            template = templates.give_function_definition(language, level)
+            argument_string = ", ".join(self(argument, language, level) for argument in node.args.args)
+
+            body = []
+            for body_node in node.body:
+                body.append(self(body_node, language, level + 1))
+            body = "\n".join(body)
+
+            return template.format(name=node.name, argument_string=argument_string, body=body)
+
+        elif type(node) is _ast.Return:
+            template = templates.give_return(language, level)
+
+            value = self(node.value, language, level + 1)
+            return template.format(value=value)
+
+        elif type(node) is _ast.arg:
+            return node.arg
 
         else:
             raise NotImplementedError(str(type(node)) + " not implemented")
