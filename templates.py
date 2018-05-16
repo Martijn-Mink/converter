@@ -40,6 +40,16 @@ _IF = {
     Language.CPP: multilinetemplates.IF_CPP
 }
 
+_ELSE_IF = {
+    Language.PYTHON: multilinetemplates.ELSE_IF_PYTHON,
+    Language.CPP: multilinetemplates.ELSE_IF_CPP
+}
+
+_ELSE = {
+    Language.PYTHON: multilinetemplates.ELSE_PYTHON,
+    Language.CPP: multilinetemplates.ELSE_CPP
+}
+
 _HEADER = {
     Language.PYTHON: None,
     Language.CPP: multilinetemplates.HEADER_CPP
@@ -89,6 +99,18 @@ def give_declared_assign(language, level):
 def give_if(language, level):
     indent = level * TAB
     template = _IF[language].replace("INDENT", indent)
+    return template
+
+
+def give_else(language, level):
+    indent = level * TAB
+    template = _ELSE[language].replace("INDENT", indent)
+    return template
+
+
+def give_else_IF(language, level):
+    indent = level * TAB
+    template = _ELSE_IF[language].replace("INDENT", indent)
     return template
 
 

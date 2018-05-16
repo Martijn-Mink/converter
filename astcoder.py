@@ -60,7 +60,11 @@ class AstCoder:
             return template.format(id=node.id)
 
         elif type(node) is _ast.If:
-            template = templates.give_if(language, level)
+
+            code = []
+
+            # if part
+            template_if = templates.give_if(language, level)
             test = self(node.test, language, level)
 
             body = []
@@ -68,12 +72,20 @@ class AstCoder:
                 body.append(self(body_node, language, level + 1))
             body = "\n".join(body)
 
-            orelse = []
-            for orelse_node in node.orelse:
-                orelse.append(self(orelse_node, language, level + 1))
-            orelse = '\n'.join(orelse)
+            code.append(template_if.format(test=test, body=body))
 
-            return template.format(test=test, body=body, orelse=orelse)
+            # else part
+            if node.orelse:
+                template_else = templates.give_else(language, level)
+
+                orelse = []
+                for orelse_node in node.orelse:
+                    orelse.append(self(orelse_node, language, level + 1))
+                orelse = '\n'.join(orelse)
+
+                code.append(template_else.format(orelse=orelse))
+
+            return "\n".join(code)
 
         elif type(node) is _ast.BinOp:
             template = templates.give_binop(language, node.op)
@@ -91,8 +103,8 @@ class AstCoder:
 
                 return template.format(args0=self(node.args[0], language, level))
 
-        elif type(node) is _ast.NameConstant:
-            return templates.give_bool_code(language, node.value)
+        # elif type(node) is _ast.NameConstant:
+        #     return templates.give_bool_code(language, node.value)
 
         elif type(node) is _ast.Compare:
             # https://stackoverflow.com/questions/20449543/bash-equality-operators-eq
