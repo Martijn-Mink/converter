@@ -9,7 +9,7 @@ INPUT_PATH = os.path.join('code', 'input.py')
 
 
 def create_code(tree, language):
-    coder = astcoder.AstCoder()
+    coder = astcoder.AstCoder(INPUT_PATH)
 
     header = templates.give_header(language)
     footer = templates.give_footer(language)

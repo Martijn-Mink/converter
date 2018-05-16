@@ -4,10 +4,13 @@ import templates
 from enums import VarType, BuiltinFunction
 
 
+
+
 class AstCoder:
 
-    def __init__(self):
+    def __init__(self, code_path):
         self.declared_names = {}
+        self.code_path = code_path
 
     def find_var_type(self, node):
         if type(node) is _ast.Num:
@@ -106,7 +109,7 @@ class AstCoder:
             else:
                 argument_string = ", ".join(self(argument, language, level) for argument in node.args)
                 template = templates.give_function_call(language)
-                return template.format(func=func,argument_string=argument_string)
+                return template.format(func=func, argument_string=argument_string)
 
         elif type(node) is _ast.NameConstant:
             return templates.give_bool_code(language, node.value)
@@ -120,6 +123,8 @@ class AstCoder:
             return template.format(left=left, comparators0=comparators0)
 
         elif type(node) is _ast.FunctionDef:
+            annotation = read_annotation(node, self.code_path)
+
             template = templates.give_function_definition(language, level)
             argument_string = ", ".join(self(argument, language, level) for argument in node.args.args)
 
@@ -141,3 +146,7 @@ class AstCoder:
 
         else:
             raise NotImplementedError(str(type(node)) + " not implemented")
+
+
+if __name__ == "__main__":
+    raise Exception("No main in this file")
