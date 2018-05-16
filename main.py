@@ -15,9 +15,7 @@ def create_code(tree, language):
     footer = templates.give_footer(language)
     starting_level = language.give_starting_indent()
 
-    code = []
-    for node in tree.body:
-        code.append(coder(node, language, starting_level))
+    code = [coder(node, language, starting_level) for node in tree.body]
 
     if header:
         code = [header] + code

@@ -3,12 +3,7 @@ import enum
 
 class Language(enum.Enum):
     PYTHON = 0
-    JAVA = 1
-    CPP = 2
-    BASH = 3
-
-    def is_typed(self):
-        return self in _TYPED_LANGUAGES
+    CPP = 1
 
     def give_extension(self):
         return _EXTENSIONS[self]
@@ -19,17 +14,11 @@ class Language(enum.Enum):
 
 _EXTENSIONS = {
     Language.PYTHON: '.py',
-    Language.JAVA: '.java',
-    Language.CPP: '.cpp',
-    Language.BASH: '.sh'}
+    Language.CPP: '.cpp'}
 
 _STARTING_INDENT = {
     Language.PYTHON: 0,
-    Language.JAVA: 2,
-    Language.CPP: 1,
-    Language.BASH: 0}
-
-_TYPED_LANGUAGES = (Language.CPP, Language.JAVA)
+    Language.CPP: 1}
 
 
 class BuiltinFunction(enum.Enum):
@@ -88,7 +77,8 @@ class VarType(enum.Enum):
             raise NotImplementedError
 
     @staticmethod
-    def reduce(var_type1, var_type2):
+    def combine(var_type1, var_type2):
+        """Using implicit type conversions"""
         if var_type1 == var_type2:
             return var_type1
         elif {var_type1, var_type2} == {VarType.INT, VarType.FLOAT}:

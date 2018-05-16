@@ -7,65 +7,47 @@ TAB = "    "
 
 _NAME = {
     Language.PYTHON: "{id}",
-    Language.JAVA: "{id}",
     Language.CPP: "{id}",
-    Language.BASH: "${id}"
 }
 
 _PRINT = {
     Language.PYTHON: "print({args0})",
-    Language.JAVA: "System.out.println({args0})",
-    Language.CPP: "std::cout << {args0} << std::endl",
-    Language.BASH: "echo {args0}"
+    Language.CPP: "std::cout << {args0} << std::endl"
 }
 
 _EXPRESSION = {
     Language.PYTHON: "{value}",
-    Language.JAVA: "{value};",
-    Language.CPP: "{value};",
-    Language.BASH: "{value}"
+    Language.CPP: "{value};"
 }
 
 _EVALUATION = {
     Language.PYTHON: "({contents})",
-    Language.JAVA: "({contents})",
-    Language.CPP: "({contents})",
-    Language.BASH: "$(({contents}))"
+    Language.CPP: "({contents})"
 }
 
 _DECLARED_ASSIGN = {
     Language.PYTHON: "{target0} = {value}",
-    Language.JAVA: "{var_type} {target0} = {value};",
-    Language.CPP: "{var_type} {target0} = {value};",
-    Language.BASH: "{target0}={value}"
+    Language.CPP: "{var_type} {target0} = {value};"
 }
 
 _ASSIGN = {
     Language.PYTHON: "{target0} = {value}",
-    Language.JAVA: "{target0} = {value};",
-    Language.CPP: "{target0} = {value};",
-    Language.BASH: "{target0}={value}"
+    Language.CPP: "{target0} = {value};"
 }
 
 _IF = {
     Language.PYTHON: multilinetemplates.IF_PYTHON,
-    Language.JAVA: multilinetemplates.IF_JAVA_CPP,
-    Language.CPP: multilinetemplates.IF_JAVA_CPP,
-    Language.BASH: multilinetemplates.IF_BASH
+    Language.CPP: multilinetemplates.IF_CPP
 }
 
 _HEADER = {
     Language.PYTHON: None,
-    Language.JAVA: multilinetemplates.HEADER_JAVA,
-    Language.CPP: multilinetemplates.HEADER_CPP,
-    Language.BASH: None
+    Language.CPP: multilinetemplates.HEADER_CPP
 }
 
 _FOOTER = {
     Language.PYTHON: None,
-    Language.JAVA: multilinetemplates.FOOTER_JAVA,
-    Language.CPP: multilinetemplates.FOOTER_CPP,
-    Language.BASH: None
+    Language.CPP: multilinetemplates.FOOTER_CPP
 }
 
 
@@ -115,41 +97,24 @@ def give_evaluation(language):
 
 
 def give_compare(language, op):
-
     # Booleans are only supported in if statements currently
     template = "{contents}"
-    #template = give_evaluation(language)
+    # template = give_evaluation(language)
 
-    if language != Language.BASH:
-        if type(op) is _ast.Eq:
-            template = template.format(contents="{left} == {comparators0}")
-        elif type(op) is _ast.NotEq:
-            template = template.format(contents="{left} != {comparators0}")
-        elif type(op) is _ast.Gt:
-            template = template.format(contents="{left} > {comparators0}")
-        elif type(op) is _ast.Lt:
-            template = template.format(contents="{left} < {comparators0}")
-        elif type(op) is _ast.GtE:
-            template = template.format(contents="{left} >= {comparators0}")
-        elif type(op) is _ast.LtE:
-            template = template.format(contents="{left} <= {comparators0}")
-        else:
-            raise NotImplementedError("{}".format(op))
+    if type(op) is _ast.Eq:
+        template = template.format(contents="{left} == {comparators0}")
+    elif type(op) is _ast.NotEq:
+        template = template.format(contents="{left} != {comparators0}")
+    elif type(op) is _ast.Gt:
+        template = template.format(contents="{left} > {comparators0}")
+    elif type(op) is _ast.Lt:
+        template = template.format(contents="{left} < {comparators0}")
+    elif type(op) is _ast.GtE:
+        template = template.format(contents="{left} >= {comparators0}")
+    elif type(op) is _ast.LtE:
+        template = template.format(contents="{left} <= {comparators0}")
     else:
-        if type(op) is _ast.Eq:
-            template = template.format(contents="{left} -eq {comparators0}")
-        elif type(op) is _ast.NotEq:
-            template = template.format(contents="{left} -ne {comparators0}")
-        elif type(op) is _ast.Gt:
-            template = template.format(contents="{left} -gt {comparators0}")
-        elif type(op) is _ast.Lt:
-            template = template.format(contents="{left} -lt {comparators0}")
-        elif type(op) is _ast.GtE:
-            template = template.format(contents="{left} -ge {comparators0}")
-        elif type(op) is _ast.LtE:
-            template = template.format(contents="{left} -le {comparators0}")
-        else:
-            raise NotImplementedError("{}".format(op))
+        raise NotImplementedError("{}".format(op))
 
     return template
 
